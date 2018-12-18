@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>ES6</title>
+</head>
+<body>
+<script>
+
+//    this指向问题
+//    在普通函数中。this指向它的调用者，如果找不到直接调用者，就是window
+//    定时器中的this默认指向window
+//    ES6中箭头函数中的this指向 继承自父上下文
+    var a = 1, b = 2;
+//    var add = (x,y) => {
+//        console.log(this.a + this.b + x + y);
+//        console.log(this);
+//    }
+//    function add(x, y){
+//        console.log(this.a + this.b + x + y);
+//        console.log(this);
+//    }
+//    add(10,20);
+
+//    ES6中箭头函数中的this指向 继承自父上下文
+    let obj = {
+        a: 1,
+        b: function() {
+            setTimeout( function () {
+                console.log(this); // window
+            }, 0);
+        },
+        c: function() {
+            setTimeout( () => {
+                console.log(this); // obj
+            }, 1000);
+        },
+        d: () => {
+            console.log('d',this); // window
+        }
+
+    };
+//    obj.b();
+//    obj.c();
+//    obj.d();
+
+//    扩展运算符（spread）即三个点...
+//console.log(1, ...[2, 3, 4], 5);// 1 2 3 4 5
+
+
+//    扩展运算符可以替代函数的apply方法， 因为扩展运算符可以展开数组
+    function fun(x,y) {
+        return x + y;
+    }
+//    console.log(fun.apply(null, [1,2])); // ES5
+//    console.log(fun(...[10,20])); // ES6
+
+    Math.max.apply(null, [1,22,3]); // ES5
+    Math.max(...[1,22,3]); // ES6
+//    但都等同于math.max(1,22,3);
+
+    var arr1 = [12,32], arr2 = [33,44,55];
+    Array.prototype.push.apply(arr1,arr2); // ES5
+    arr1.push(...arr2); // ES6
+
+//    concat不会改变现有的数组，而仅仅会返回被连接数组的一个副本
+
+
+
+
+</script>
+</body>
+</html>

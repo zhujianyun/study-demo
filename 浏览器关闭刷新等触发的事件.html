@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>捕获浏览器关闭、刷新事件不同情况下的处理方法</title>
+</head>
+<body>
+<a href="https://www.baidu.com">百度</a>
+<script type="text/javascript">
+    window.onbeforeunload = function()
+    {
+//用户点击浏览器右上角关闭按钮或是按alt+F4关闭
+        if(event.clientX>document.body.clientWidth&&event.clientY<0||event.altKey)
+        {
+// alert("点关闭按钮");
+            document.getElementById("hiddenForm:hiddenBtn").click();
+// window.event.returnValue="确定要退出本页吗?";
+        }
+//用户点击任务栏，右键关闭。s或是按alt+F4关闭
+        else if(event.clientY > document.body.clientHeight || event.altKey)
+        {
+// alert("任务栏右击关闭");
+            document.getElementById("hiddenForm:hiddenBtn").click();
+// window.event.returnValue="确定要退出本页吗?";
+        }
+//其他情况为刷新
+        else
+        {
+// alert("刷新页面");
+        }
+    }
+</script>
+</body>
+</html>

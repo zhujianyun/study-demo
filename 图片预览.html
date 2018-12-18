@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>图片预览</title>
+	<link rel="stylesheet" type="text/css" href="./css/viewer.min.css">
+	<script src="./js/jquery-1.8.3/jquery.min.js"></script>
+	<script src="./js/viewer/viewer.min.js"></script>
+</head>
+<body>
+	<span id="111">
+	<img data-original="img/tibet-1.jpg" src="./img/1.png" alt="图片1">
+	<img data-original="img/tibet-1.jpg" src="./img/2.png" alt="图片2">
+	<img data-original="img/tibet-1.jpg" src="./img/3.png" alt="图片3">
+	</span>
+	<span id="222">
+	<img data-original="img/tibet-1.jpg" src="./img/1.png" alt="图片1">
+	<img data-original="img/tibet-1.jpg" src="./img/2.png" alt="图片2">
+	<img data-original="img/tibet-1.jpg" src="./img/3.png" alt="图片3">
+	</span>
+<script>
+	var viewer = new Viewer(document.getElementById('111'), {
+		url: 'src'
+	});
+</script>
+</body>
+</html>

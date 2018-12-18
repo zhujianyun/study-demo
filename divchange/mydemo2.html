@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>jQuery拖拽，改变大小mydemo2</title>
+    <script src="../js/jquery-1.8.3/jquery.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+        }
+
+        ul, ol, li {
+            list-style: none; 
+        }
+        
+        #wrap {
+            width: 660px;
+            height: 150px;
+            margin: 50px auto;
+            clear: both;
+            background-color: #00cccc;
+            position: relative;
+        }
+        
+        #wrap li {
+            width: 220px;
+            float: left;
+            height: 150px;
+            background-color: #ccc;
+            overflow: hidden;
+            text-align: center;
+        }
+
+        #wrap li.li1{background: #777;}
+        #wrap li.li2{background: #ccc;}
+        #wrap li.li3{background: #999;}
+        #wrap label {
+            float: left;
+            width: 10px;
+            height: 150px;
+            cursor: e-resize;
+            position: absolute;
+
+        }
+
+        #wrap label.lab1 {
+            left: 210px;
+            background-color: #f00;
+        }
+
+        #wrap label.lab2 {
+            left: 434px;
+            background-color: #f00;
+        }
+
+    </style>
+</head>
+<body>
+    <div id="wrap">
+        <ul>
+            <li class="li1">first box</li>
+            <label class="lab1" id="lab1">1</label>
+            <li class="li2">second box</li>
+            <label class="lab2" id="lab2">2</label>
+            <li class="li3">third</li>
+        </ul>
+    </div>
+
+    <script>
+        $(function () {
+            var clickX, leftOffset, inx, nextW2, nextW;
+            var draging = false;
+            var doc = document;
+            var labBtn = $('#wrap').find('label');
+            var wrapWidth = $('#wrap').width();
+
+            labBtn.bind('mousedown', function(e) {
+                dragging = true;
+                e.preventDefault();
+                leftOffset = $('#wrap').offset().left;
+                inx = $(this).index('label');
+                console.log($(this).index());
+            });
+        });
+    </script>
+</body>
+</html>

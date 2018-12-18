@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>简单模拟x-mind图</title>
+    <script src="./js/jquery-1.8.3/jquery.js"></script>
+    <link rel="stylesheet" href="./css/common.css">
+    <style>
+
+        .mind {
+            margin: 20px;
+        }
+        .box {
+            width: 100px;
+            height:100px;
+            background-color: gray;
+            position: relative;
+        }
+        .add {
+            display: block;
+            width:20px;
+            height:20px;
+            border: 1px solid #cccccc;
+            position: absolute;
+            top: 50%;
+            right: 0;
+            transform: translate(0, -50%);
+            /*text-align: center;*/
+            line-height: 20px;
+            font-size: 20px;
+            color: #fff;
+            cursor: pointer;
+            display: none;
+        }
+
+        .line {
+            display: block;
+            width: 100px;
+            height: 2px;
+            background-color: #222222;
+            position: relative;
+        }
+        .line:after {
+            content:"";
+            width: 0;
+            height:0;
+            display: inline-block;
+            border-left:14px solid #222222;
+            border-right:14px solid transparent;
+            border-top:14px solid transparent;
+            border-bottom:14px solid transparent;
+            position: absolute;
+            top: -14px;
+            right: -16px;
+        }
+
+        .desk_ul {
+            position: absolute;
+            top: 50%;
+            right: -100px;
+        }
+
+        .desk_ul .box {
+            left: 104px;
+            top: -50px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="mind">
+        <div class="box">
+            <i class="add" title="添加子任务">+</i>
+            <ul class="desk_ul">
+                <li class="desk_li">
+                    <i class="line"></i>
+                    <div class="box"></div>
+                </li>
+            </ul>
+        </div>
+    </div>
+
+    <script>
+        $(function() {
+            let box = $('.box');
+            let add = $('.add');
+            let deskUl = $('.desk_ul');
+            box.hover(function() {
+                add.css('display', 'block');
+            },function() {
+                add.css('display', 'none');
+            });
+
+            add.click(function() {
+                console.log('add');
+            });
+
+            
+
+        });
+
+    </script>
+</body>
+</html>

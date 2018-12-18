@@ -1,0 +1,669 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>模仿甘特图</title>
+    <!--<link rel="stylesheet" type="text/css" href="./css/common.css">-->
+    <script type="text/javascript" src="https://unpkg.com/jquery"></script>
+    <script type="text/javascript" src="https://unpkg.com/vue"></script>
+    <style>
+        /*公共样式--开始*/
+        html, body, div, ul, li, h1, h2, h3, h4, h5, h6, p, dl, dt, dd, ol, form, input, textarea, th, td, select {
+            margin: 0;
+            padding: 0;
+        }
+        *{box-sizing: border-box;}
+        html, body {
+            min-height: 100%;
+        }
+
+        body {
+            font-family: "Microsoft YaHei";
+            font-size:14px;
+            color:#333;
+        }
+        h1, h2, h3, h4, h5, h6{font-weight:normal;}
+        ul,ol {
+            list-style: none;
+        }
+
+        img {
+            border: none;
+            vertical-align: middle;
+        }
+
+        a {
+            text-decoration: none;
+            color: #232323;
+        }
+
+        table {
+            border-collapse: collapse;
+            table-layout: fixed;
+        }
+
+        /*input, textarea {*/
+        /*outline: none;*/
+        /*border: none;*/
+        /*}*/
+
+        textarea {
+            resize: none;
+            overflow: auto;
+        }
+
+        .clearfix {
+            zoom: 1;
+        }
+
+        .clearfix:after {
+            content: ".";
+            width: 0;
+            height: 0;
+            visibility: hidden;
+            display: block;
+            clear: both;
+            overflow:hidden;
+        }
+
+        .fl {
+            float: left
+        }
+
+        .fr {
+            float: right
+        }
+
+        .tl {
+            text-align: left;
+        }
+
+        .tc {
+            text-align: center
+        }
+
+        .tr {
+            text-align: right;
+        }
+
+        .ellipse {
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        .inline{
+            display: inline-block;
+            *display: inline;
+            *zoom: 1;
+        }
+
+        #app {
+            padding:10px;
+        }
+       .gantt_box {
+           width: 900px;
+           overflow-x: scroll;
+           background-color: azure;
+       }
+
+       .gantt_box .gantt_table {
+           border: 1px solid #cad9ea;
+           color: gray;
+           table-layout:fixed;
+           empty-cells:show;
+           border-collapse: collapse;
+           margin:0 auto;
+
+       }
+
+
+       .gantt_box .gantt_table .gantt_thead {
+            vertical-align: middle;
+       }
+       .gantt_box .gantt_table .gantt_thead tr{
+
+       }
+       .gantt_box .gantt_table .gantt_thead th{
+           border: 1px solid #cad9ea;
+           height: 30px;
+           padding: 0 20px;
+           width: 40px;
+       }
+
+
+
+       .gantt_box .gantt_table .gantt_tbody {
+           vertical-align: middle;
+
+       }
+       .gantt_box .gantt_table .gantt_tbody tr{
+           border: 1px solid deeppink;
+           text-align: center;
+
+
+       }
+       .gantt_box .gantt_table .gantt_tbody td{
+           border: 2px dashed greenyellow;
+           width: 40px;
+           height: 240px;
+
+       }
+        .tesk {
+            width: 100%;
+            height: 95%;
+            /*background-color: #f0f0f0;*/
+            /*background-color: #f0f0f0;*/
+            cursor: pointer;
+        }
+
+        .tesk .tesk_ul {
+            width: 100%;
+            height: 100%;
+        }
+
+        .tesk .tesk_ul .tesk_li {
+            width: 100px;
+            height: 100px;
+            margin: 10px;
+            background-color: #f0f0f0;
+        }
+
+        .create_desk {
+            border: 2px solid lawngreen;
+            margin: 10px;
+            -webkit-box-shadow: inset hoff voff blur color;
+            -moz-box-shadow: inset hoff voff blur color;
+            /*box-shadow: inset hoff voff blur color;*/
+            /*-webkit-box-sizing: border-box;*/
+            /*-moz-box-sizing: border-box;*/
+            /*box-sizing: border-box;*/
+        }
+        .create_desk .desk_type {
+            margin-left: 10px;
+            margin-top: 10px;
+            font-weight: bold;
+
+        }
+
+        .create_desk ul {
+        }
+        .create_desk ul li {
+            margin: 10px;
+        }
+
+        .create_desk button {
+            margin-left: 10px;
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+<div id="app">
+    <gantt></gantt>
+</div>
+<script type="text/x-template" id="gantt">
+    <div>
+
+        <div class="gantt_box">
+            <table class="gantt_table" id="tab">
+                <thead class="gantt_thead">
+                <tr>
+                    <th v-for="(ele, index) in mergeTable" :key="index" :colspan="ele.num">{{ele.month}}/{{ele.year}}</th>
+                </tr>
+                <tr>
+                    <th v-for="(day, index) in dateList" :key="index">{{day.day}}</th>
+                </tr>
+                </thead>
+                <tbody class="gantt_tbody">
+                <tr v-for="(li, index) in [1]" :key="index">
+                    <td v-for="(tesks, index) in dateList" :key="index">
+                        <div  class="tesk">
+                            <ul
+                                    class="tesk_ul"
+                                    @dragenter="teskDragEnter($event,tesks)"
+                                    @dragover="teskDragOver($event,tesks)"
+                                    @drop="teskDrop($event,tesks)"
+                                    @dblclick.stop="createTesk($event,tesks)"
+                            >
+                                <li class="tesk_li" v-if="tesks.tesk" v-for="(ts, index) in tesks.tesk" :key="index"
+                                    draggable="true"
+                                    @drag="teskDrag($event,ts,tesks.tesk)"
+                                    @dragstart="teskDragstart($event,ts,tesks.tesk)"
+                                    @dragover="teskDragover($event,ts)"
+                                    @dragend="teskDragend($event)"
+                                    @dblclick.stop="createTesk($event,ts)"
+                                    @click.stop="createTesk($event,ts)"
+                                >
+                                    <p>{{ts.title}}</p>
+                                    <p class="content"><span>{{ts.content}}</span></p>
+                                    <p class="time_from">{{ts.timeFrom}}</p>
+                                    <!--<p class="time_to">{{ts.timeTo}}</p>-->
+                                </li>
+
+                            </ul>
+                            
+                        </div>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="create_desk" v-show="addOrEditType === 1 || addOrEditType === 0">
+            <p class="desk_type" style="">{{addOrEditType ? '新增' : '编辑'}}</p>
+            <ul>
+                <li>
+                    <label for="title">任务名称</label>
+                    <input type="text" id="title" v-model="title">
+                </li>
+                <li>
+                    <label for="content">任务内容</label>
+                    <input type="text" id="content" v-model="content">
+                </li>
+                <li>
+                    <label for="timeFrom">任务名称</label>
+                    <input type="date" id="timeFrom" v-model="timeFrom">
+                </li>
+                <li>
+                    <label for="timeTo">任务名称</label>
+                    <input type="date" id="timeTo" v-model="timeTo">
+                </li>
+            </ul>
+            <button class="submit" type="button" @click="addOrEdit">保存</button>
+            <button class="cancel" type="button" @click="cancel">取消</button>
+        </div>
+
+    </div>
+
+
+</script>
+<script>
+    Vue.component('gantt',{
+        'template': '#gantt',
+        props: {
+            value: {
+
+            }
+        },
+        data() {
+            return {
+                dateList: [], // 列表内容
+                mergeTable: [], // 日期列表头部合并
+                nowDate: null, // 获取现在的时间
+                teskList: [
+                    {
+                        id: '001',
+                        title: '任务1',
+                        content: '这是第一个任务',
+                        timeFrom: '2018-02-28',
+                        timeTo: '2018-03-01'
+                    },{
+                        id: '002',
+                        title: '任务2',
+                        content: '画原型图',
+                        timeFrom: '2018-02-28',
+                        timeTo: '2018-03-01'
+                    },{
+                        id: '003',
+                        title: '任务3',
+                        content: '根据原型图画UI图',
+                        timeFrom: '2018-03-01',
+                        timeTo: '2018-03-03'
+                    },{
+                        id: '004',
+                        title: '任务4',
+                        content: '根据UI图切图',
+                        timeFrom: '2018-03-03',
+                        timeTo: '2018-03-03'
+                    },{
+                        id: '005',
+                        title: '任务5',
+                        content: '写逻辑调借口进行实际开发',
+                        timeFrom: '2018-03-19',
+                        timeTo: '2018-04-10'
+                    },{
+                        id: '006',
+                        title: '任务6',
+                        content: '000000额0000',
+                        timeFrom: '2018-02-25',
+                        timeTo: '2018-02-27'
+                    },{
+                        id: '007',
+                        title: '任务7',
+                        content: '这是第7个任务',
+                        timeFrom: '2018-02-25',
+                        timeTo: '2018-02-25'
+                    },{
+                        id: '008',
+                        title: '任务8',
+                        content: '画原型图888',
+                        timeFrom: '2018-02-26',
+                        timeTo: '2018-02-26'
+                    },{
+                        id: '009',
+                        title: '任务9',
+                        content: '画9999',
+                        timeFrom: '2018-02-26',
+                        timeTo: '2018-02-26'
+                    },{
+                        id: '010',
+                        title: '任务10',
+                        content: '这是第10个任务',
+                        timeFrom: '2018-02-27',
+                        timeTo: '2018-02-27'
+                    },{
+                        id: '011',
+                        title: '任务11',
+                        content: '这是第11个任务',
+                        timeFrom: '2018-02-27',
+                        timeTo: '2018-02-27'
+                    },{
+                        id: '012',
+                        title: '任务12',
+                        content: 'qwertgyh我bvcx',
+                        timeFrom: '2018-02-25',
+                        timeTo: '2018-02-27'
+                    }
+                ], // 获取日期列表
+                eleDrag: null, // 现在拖拽的内容
+                title: '', // 任务标题
+                content: '', // 任务内容
+                timeFrom: '', // 任务开始时间
+                timeTo: '', // 任务结束时
+                addOrEditType: null, // 新增任务(1) 编辑任务(0)
+                dragTeskItem: null, // 拖拽任务的函数
+
+            }
+        },
+        methods: {
+
+            teskDragEnter(e, tesks) {
+                // console.log('enter', e.target);
+
+            },
+
+            teskDragOver(e, tesks) {
+                // console.log('over', e.target);
+                if (e.preventDefault) {
+                    e.preventDefault();
+                }
+                e.dataTransfer.dropEffect = 'move';
+                return false;
+            },
+
+            // 选中拖拽元素时触发
+            teskDrag(e, tesk, teskList) {
+
+            },
+
+            // 拖拽元素放置时触发
+            teskDrop(e, tesks) {
+                e.preventDefault();
+
+//                console.log('落下', tesks.tesk);
+                let ok = null;
+
+                let getDragTarget = (tag) => {
+                    console.log('parents：', tag);
+
+                    let indexs = (tag && tag.className) ? tag.className.indexOf('tesk_li') : -1;
+
+                    if(indexs !== -1) {
+                        let parents = [...new Set(tag.parentNode.children)];
+
+                        ok = parents.findIndex( ele => {
+                            return ele === tag;
+                        });
+
+                    }else {
+                        tag = tag.parentNode;
+                        getDragTarget(tag);
+                    }
+                };
+                getDragTarget(e.target);
+                console.log('第几个：', ok);
+
+
+                let getTesk = JSON.parse(e.dataTransfer.getData("text"));
+
+                let have = tesks.tesk.findIndex( el => {
+
+                    return el.id === getTesk.id;
+                });
+//
+//                if(have !== -1) { // 行内排序
+//
+//
+//                    return;
+//                } // 去重
+
+                let indexs = this.dateList.findIndex( el => {
+                    return el.ymd === tesks.ymd;
+                });
+
+                if(indexs !== -1) {
+                    getTesk.timeFrom = tesks.ymd;
+                    this.dateList[indexs].tesk.splice(ok, 0, getTesk);
+//                    this.dateList[indexs].tesk.push(getTesk);
+                }
+
+                this.dragTeskItem();
+
+                // eleDrag[0].parentNode.removeChild(eleDrag[0]);
+
+
+                return false;
+
+            },
+
+            // 开始拖动时触发
+            teskDragstart(e, tesk, teskList) {
+                e.target.style.opacity = '0.5';
+                e.target.style.border = '2px dashed lawngreen';
+                e.dataTransfer.setData("text", JSON.stringify(tesk));
+
+                // eleDrag = [e.target, tesk, teskList];
+
+                this.dragTeskItem = () => {
+                    let del = teskList.findIndex( ele => {
+                        return ele.id === tesk.id;
+                    });
+                    if(del !== -1) {
+                        teskList.splice(del, 1);
+                    }
+                    let indexs = this.dateList.findIndex( el => {
+                        return el.ymd === teskList.ymd;
+                    });
+                    if(indexs !== -1) {
+                        this.dateList[indexs].tesk = teskList;
+                    }
+                    this.dateList = this.dateList.concat();
+
+                };
+
+                return true;
+
+            },
+
+            // 拖动到有效区域时触发
+            teskDragover(e, ts) {
+                e.preventDefault();
+                return false;
+            },
+
+            // 源对象开始进入过程对象范围内。
+            teskDragend(e) {
+                e.target.style.opacity = '1';
+                e.target.style.border = '0';
+
+            },
+
+            // 查找拖拽目标元素
+            getDragTarget() {
+
+            },
+
+
+            // 双击创建任务
+            createTesk(e, tesk) {
+
+
+                if(e.target.className !== 'tesk_ul') { // 编辑任务
+                    console.log('双击编辑任务', e.target.className,tesk);
+
+                    this.addOrEditType = 0;
+                    this.title = tesk.title; // 任务标题
+                    this.content = tesk.content; // 任务内容
+                    this.timeFrom = tesk.timeFrom; // 任务开始时间
+                    this.timeTo = tesk.timeTo; // 任务结束时
+
+                }else { // 创建任务
+                    console.log('双击创建任务', e.target.className,tesk);
+
+                    this.addOrEditType = 1;
+                    this.title = ''; // 任务标题
+                    this.content = ''; // 任务内容
+                    this.timeFrom = this.nowDate; // 任务开始时间
+                    this.timeTo = this.nowDate; // 任务结束时
+
+                }
+
+
+            },
+
+
+            // 添加/编辑任务--保存
+            addOrEdit() {
+
+            },
+
+            // 添加/编辑任务--取消
+            cancel() {
+                this.addOrEditType = null;
+                this.title = ''; // 任务标题
+                this.content = ''; // 任务内容
+                this.timeFrom = this.nowDate; // 任务开始时间
+                this.timeTo = this.nowDate; // 任务结束时
+            },
+            // 获取时间段列表
+            getDayList(start, end) {
+                function getDate(datestr){
+                    let temp = datestr.split("-");
+                    let date = new Date(temp[0],temp[1],temp[2]);
+                    return date;
+                }
+                let startTime = getDate(start);
+                let endTime = getDate(end);
+                while((endTime.getTime()-startTime.getTime())>=0){
+                    let year = startTime.getFullYear();
+                    let month = startTime.getMonth().toString().length===1?"0"+startTime.getMonth().toString():startTime.getMonth();
+                    let day = startTime.getDate().toString().length===1?"0"+startTime.getDate():startTime.getDate();
+                    this.dateList.push(
+                        {
+                            year: year.toString(),
+                            month: month.toString(),
+                            day: day.toString(),
+                            ymd: year.toString() + '-' + month.toString() + '-' + day.toString()
+                        }
+                        );
+                    startTime.setDate(startTime.getDate()+1);
+                }
+                this.dateList.map( ele => {
+                    return ele.tesk = [];
+                });
+
+
+                for(ele of this.dateList) {
+                    for(tesks of this.teskList) {
+                        if(ele.ymd === tesks.timeFrom) {
+                            ele.tesk.push(tesks);
+                        }
+                    }
+                }
+
+
+                console.log('日期列表', this.dateList);
+
+
+            },
+
+            // 动态合并单元格
+            myMergeTAable() {
+                for(let ele of this.dateList) {
+                    let have = this.mergeTable.findIndex( (el) => {
+                        return el.year === ele.year && el.month === ele.month;
+                    });
+                    if(have !== -1) {
+                        this.mergeTable[have].num++;
+                    }else {
+                        this.mergeTable.push({year: ele.year, month: ele.month, num: 1});
+                    }
+                }
+
+                console.log('日期合并',this.mergeTable);
+            },
+
+            // 获取当前时间
+            getNowTime() {
+                let nowDate = new Date();
+                let fullYear = nowDate.getFullYear();
+                let month = nowDate.getMonth() + 1;
+                month =  month >= 10 ? month : '0' + month;
+                let day = nowDate.getDate() >= 10 ? nowDate.getDate() : '0' + nowDate.getDate();
+                this.nowDate = fullYear + '-' + month + '-' + day;
+                this.timeFrom = this.timeTo = this.nowDate;
+
+                    console.log('当前时间',this.nowDate);
+            },
+
+            // 小时分钟时间段
+            getTimeList(times, step) {
+                let minutes = 60;
+                let timeArr = [];
+                times = times;
+                step = step;
+
+                for(var i = 0; i < times; i++){
+                    let str = '';
+                    if(i < 10) {
+                        str = 0 + '' + i
+                    } else {
+                        str = '' + i
+                    }
+
+                    for(var j = 0; j < minutes; j++) {
+                        if(j % step == 0){
+                            var s = j < 10 ? ':' + 0 + '' + j : ':' +  j;
+                            s = str + s;
+                            timeArr.push(s);
+                        }
+                    }
+                }
+
+                return timeArr;
+            }
+        },
+        created() {
+            this.getNowTime(); // 获取当前时间
+            this.getDayList("2018-02-25","2018-05-03"); // 获取时间列表
+        },
+        mounted() {
+            this.$nextTick( () => {
+                this.myMergeTAable(); // 动态合并单元格
+            });
+        }
+    });
+    new Vue({
+        el: '#app',
+        data() {
+            return {
+
+            }
+        },
+        methods: {
+
+        }
+    });
+</script>
+</body>
+</html>

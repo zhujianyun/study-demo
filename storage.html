@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>storage</title>
+</head>
+<body>
+	<script>
+		var obj = {name: 'jack'};
+		for(let key in obj) {
+		    localStorage.setItem(key, obj[key]);
+		}
+		localStorage.setItem('name', 'merry');
+
+		console.log(localStorage.getItem('name'));
+	</script>
+</body>
+</html>

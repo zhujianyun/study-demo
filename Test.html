@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+		<script type="text/javascript" src="https://unpkg.com/jquery"></script>
+		<script type="text/javascript" src="https://unpkg.com/jquery.caret"></script>
+		<script src="https://unpkg.com/vue"></script>
+	</head>
+<body>
+<div id="t-textarea-test">
+	<t-textarea>
+		<ul style="background: antiquewhite; height:158px; width:158px;">
+			<li>11111</li>
+			<li>22222</li>
+			<li>33333</li>
+			<li>44444</li>
+		</ul>
+	</t-textarea>
+	<t-textarea>
+		<ul style="background: antiquewhite; height:158px; width:158px;">
+			<li>aaaaa</li>
+			<li>bbbbb</li>
+			<li>ccccc</li>
+			<li>ddddd</li>
+		</ul>
+	</t-textarea>
+</div>
+
+<script type="text/x-template" id="t-textarea-template">
+	<div class="t-contain">
+		<span ref="area" class="t-area-contain">
+			<textarea class="t-textarea" @input="keyup">
+			</textarea>
+		</span>
+		<span ref="layer" class="t-layer-contain">
+			<slot>测试测试</slot>
+		</span>
+	</div>
+</script>
+
+<script>
+	Vue.component('t-textarea', {
+		template: '#t-textarea-template',
+		props: {
+		},
+		data: function() {
+			return {
+			}
+		},
+		methods: {
+			keyup: function(event) {
+				let target = event.target || event.srcElement;
+				let pos = $(target).caret('position');
+				$(this.$refs.layer).css("top", pos.top);
+				$(this.$refs.layer).css("left", pos.left);
+			}
+		},
+		created: function() {
+		}
+	});
+	new Vue({
+		el: '#t-textarea-test',
+		data() {
+			return {
+			}
+		},
+		methods: {
+		}
+	});
+</script>
+
+<!-- 组件外样式 -->
+<style>
+	html, body {
+		background:#F9F9F9;
+		padding: 0;
+		margin: 0;
+	}
+	.t-contain {
+		height: 400px;
+		width: 90%;
+		padding: 5px 8px;
+		margin: 10px 0;
+	}
+</style>
+<!-- 组件自身公共样式 -->
+<style>
+	.t-contain {
+		position:relative;
+	}
+	.t-area-contain {
+		width: 100%;
+		height: 100%;
+		position: absolute;
+		left:0;
+		top:0;
+	}
+	.t-layer-contain {
+		position:absolute;
+		left:0;
+		top:0;
+	}
+	.t-textarea {
+		overflow: auto;
+		width: 100%;
+		height: 100%;
+		border: 1px solid #dadada;
+		border-radius: 4px;
+		outline: 0 none;
+		background: white;
+	}
+</style>
+</body>
+</html>

@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>2d</title>
+    <script src="./js/jquery-1.8.3/jquery.min.js"></script>
+  <style>
+    .div1 {
+        transition: all 1s linear;
+
+        width: 100px;
+      height: 100px;
+      background-color: pink;
+    }
+
+
+
+    .div2 {
+        transition: all 1s linear;
+
+        width: 200px;
+      height: 200px;
+      background-color: red;
+
+    }
+
+    .div11 {
+
+      transition: all 1s linear;
+      width: 200px;
+      height: 200px;
+      background-color: greenyellow;
+    }
+
+    .div22 {
+      transition: all 1s linear;
+
+      width: 100px;
+      height: 100px;
+      background-color: blueviolet;
+
+    }
+  </style>
+</head>
+<body>
+  <div class="div1">111111</div>
+  <div class="div2">2222222</div>
+  <script>
+      $(function() {
+         $('.div1').click(function() {
+             $(this).toggleClass('div11');
+             $('.div2').toggleClass('div22');
+         });
+      });
+
+
+  </script>
+</body>
+</html>

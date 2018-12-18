@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>css制作三角形&垂直居中</title>
+	<style>
+		ul{
+		display: flex;
+		height: 100px;
+		background: grey;
+		align-items: center;
+	}
+	ul li{
+		background: red;
+		margin-right: 10px;
+		list-style: none;
+		
+	}
+	.box {
+		height:30px;
+		display: flex;
+		align-items: center;
+	}
+
+	.left {
+		display: inline-block;
+		height:30px;
+		line-height: 30px;
+		background-color: yellow;
+	}
+	.right {
+		display: inline-block;
+		width: 0;
+		height: 0;
+		border-left: 15px solid red;
+		border-top: 15px solid transparent;
+		border-right: 15px solid transparent;
+		border-bottom: 15px solid transparent;
+	}
+	</style>
+</head>
+<body>
+	<div class="box">
+		<span class="left">制作三角形</span><i class="right"></i>		
+	</div>
+	<ul>
+		<li>1111</li>
+		<li>2</li>
+		<li>3333333</li>
+	</ul>
+</body>
+</html>

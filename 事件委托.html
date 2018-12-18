@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>事件委托</title>
+</head>
+<body>
+	<ul>
+		<li>1111111111111</li>
+		<li>222222222222</li>
+		<li>33333333333333</li>
+		<li>44444444444444444</li>
+		<li>5555555555555</li>
+	</ul>
+	<script type="text/javascript" charset="utf-8">
+		let list = document.querySelector('ul');
+		let li = document.querySelectorAll('li');
+		list.addEventListener('click',function(event) {
+			let target = event.target || window.event.srcElement;
+			for(let ele of Array.from(li)) {
+				ele.style.backgroundColor = '';
+			}
+			target.style.backgroundColor = 'red';
+		});
+	</script>
+</body>
+</html>

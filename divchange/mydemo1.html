@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>我的拖拽改变元素大小</title>
+    <script src="../js/jquery-1.8.3/jquery.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+        }
+        ul, li, ol  {
+            list-style: none;
+        }
+        #box {
+            width: 600px;
+            height: 600px;
+            border: 1px solid greenyellow;
+            margin-left: 20px;
+        }
+        #one {
+            width: 300px;
+            height: 200px;
+            margin-top: 20px;
+            background-color: lightgrey;
+            /*cursor: s-resize;*/
+
+            min-height: 100px;
+            max-height: 300px;
+            overflow: auto;
+        }
+
+        #line {
+            width: 300px;
+            border-top: 4px solid grey;
+            cursor: s-resize;
+
+        }
+
+        #two {
+            width: 300px;
+            height: 200px;
+            background-color: lightgrey;
+            min-height: 100px;
+            max-height: 300px;
+        }
+
+        #one ul {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-wrap: wrap;
+        }
+
+        #one ul li {
+            width: 100px;
+            height: 50px;
+            margin: 10px;
+            background-color: pink;
+        }
+    </style>
+</head>
+<body>
+    <div id="box">
+        <div id="out">
+            <div id="one">
+                <ul>
+                    <li>1111111111</li>
+                    <li>22222</li>
+                    <li>333</li>
+                    <li>4444</li>
+                </ul>
+            </div>
+            <div id="line"></div>
+            <div id="two">
+                this is two div
+            </div>
+        </div>
+    </div>
+
+
+    <script>
+
+        $(function () {
+            MbindResize(document.getElementById('line'));
+        });
+
+        function MbindResize(el) {
+            var one = $('#one'),
+                two = $('#two'),
+                out = $('#out'),
+                els = el.style,
+                y = 0, // 鼠标的XY轴坐标
+                hs = null,
+                oneHeight = one.height(),
+                twoHeight = two.height(),
+                outHeight = out.height();
+
+            $(el).mousedown(function(e) {
+                // 按下鼠标后 计算当前鼠标与对象计算后的坐标
+                y = e.clientY;
+
+                el.setCapture ? (
+                    el.setCapture(),
+                        el.onmousemove = function(ev) {
+                            mouseMove(ev || event);
+                            el.onmouseUp = mouseUp;
+                        }
+                ) : (
+                    $(document).bind("mousemove", mouseMove).bind("mouseup", mouseUp)
+                );
+                e.preventDefault();
+            });
+
+            function mouseMove(e) {
+                if(one.height() > 300 || one.height() < 100 ) return;
+
+                hs = e.clientY - y;
+
+                one.css({'height': oneHeight + hs + 'px'});
+                two.css({'height': twoHeight - hs + 'px'});
+                // console.log('outHeight->', out.height(), 'oneHeight=>', one.height(), 'twoHeight=>', two.height());
+            }
+
+            function mouseUp() {
+                el.releaseCapture ? (
+                    el.releaseCapture(),
+                        el.onmousemove = el.onmouseup = null
+                ) : (
+                    $(document).unbind("mousemove", mouseMove).unbind("mouseup", mouseUp)
+                );
+            }
+        }
+
+
+        $(function() {
+//            bindResize(document.getElementById('one'));
+
+        });
+
+        function bindResize(el) {
+            var els = el.style,
+                x = y = 0; // 鼠标的xy轴坐标
+
+            $(el).mousedown(function(e) {
+                // 按下元素后 计算当前鼠标与对象计算后的坐标
+                x = e.clientX - el.offsetWidth;
+                y = e.clientY - el.offsetHeight;
+                console.log(el,e);
+
+                // 在支持setCapture做些东西
+                // setCapture可以将鼠标事件锁定在指定的元素上，当元素捕获了鼠标事件后，该事件只能作用在当前元素上。
+                el.setCapture ? (
+                    el.setCapture(),
+                        el.onmousemove = function (ev) {
+                            mouseMove(ev || event);
+                            el.onmouseup = mouseUp;
+                        }
+                ) : (
+                    $(document).bind("mousemove", mouseMove).bind("mouseup", mouseUp)
+                );
+
+                // 防止默认事件发生
+                e.preventDefault();
+            });
+
+            function mouseMove(e) {
+                els.width = e.clientX - x + 'px';
+                els.height = e.clientY - y + 'px';
+
+            }
+
+            // 停止事件
+            function mouseUp() {
+                // 在支持releaseCaptuer
+                el.releaseCapture ? (
+                    el.releaseCapture(),
+                        el.onmousemove = el.onmouseup = null
+                ) : (
+                    // 卸载事件
+                    $(document).unbind("mousemove", mouseMove).unbind("mouseup", mouseUp)
+                );
+            }
+        }
+
+    </script>
+</body>
+</html>

@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<title>出现次数最多.html</title>
+</head>
+<body>
+	<script>
+		var str = 'hello world!!!aaaaaaa';
+		var obj = {};
+		for(var i = 0; i < str.length; i++) {
+			var char = str.charAt(i);
+			if(obj[char]) {
+				obj[char]++;
+			}else {
+				obj[char] = 1;
+			}
+		}
+		console.log(obj);
+		var max = 0;
+		var maxChar = null;
+		for(let key in obj) {
+			if(max < obj[key]) {
+				max = obj[key];
+				maxChar = key;
+			}
+		}
+
+console.log("最多的字符是" + maxChar);
+console.log("出现的次数是" + max);
+	</script>
+</body>
+</html>

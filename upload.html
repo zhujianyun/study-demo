@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>原生js实现文件上传 Test</title>
+    <script src="https://unpkg.com/vue"></script>
+</head>
+<body>
+<div id="app">
+    <div class="upload">
+        <input
+                type="file"
+                class="upload_input"
+                @change="changeUpload"
+                :multiple="multiple"
+        >
+    </div>
+</div>
+<script>
+    new Vue({
+        el: '#app',
+        data: function () {
+            return {
+                files: [],
+                multiple: true
+            }
+        },
+       methods: {
+           changeUpload(event) {
+               console.log(event.target.files[0]);
+           },
+       }
+    });
+</script>
+</body>
+</html>

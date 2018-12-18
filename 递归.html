@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>函数递归</title>
+</head>
+<body>
+<script>
+    var data = [
+        {
+            id: '1',
+            name: '一级1',
+            child: [
+                {
+                    id: '101',
+                    name: '一级-二级101'
+                }, {
+                    id: '102',
+                    name: '一级-二级102'
+                }
+            ]
+        },{
+            id: '2',
+            name: '一级2',
+            child: [
+                {
+                    id: '201',
+                    name: '一级-二级201',
+                    child: [
+                        {
+                            id: '20101',
+                            name: '一级-二级-三级20101'
+                        },{
+                            id: '20102',
+                            name: '一级-二级-三级20102'
+                        }
+                    ]
+                }
+            ]
+        },{
+            id: '3',
+            name: '一级3',
+
+        }
+    ];
+
+    function recursion(data) {
+        if(data.length) {
+            for(let li of data) {
+                console.log('li', li.name);
+                if(li.child) {
+                    recursion(li.child);
+                }
+            }
+        }
+    }
+
+    recursion(data);
+
+</script>
+</body>
+</html>

@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title>quill</title>
+    <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
+
+    <style>
+        .ql-toolbar {
+            display: none;
+        }
+
+        .ql-container.ql-snow {
+            border: 0 solid #ccc;
+        }
+
+        #editor .ql-editor {
+            font-size: 14px;
+            line-height: 30px;
+            position: relative;
+            background: url("./img/lines.png") repeat;
+            padding: 0 10px;
+        }
+        #editor .ql-editor strong {
+            font-weight: normal;
+        }
+        #editor .ql-editor u {
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        #editor .ql-editor u:hover {
+            text-decoration: underline;
+        }
+
+        #editor .ql-editor img {
+            width: 22px;
+            height: 16px;
+            display: inline-block;
+            padding: 0 4px;
+            cursor: pointer;
+            margin-bottom: 4px;
+            vertical-align: middle;
+        }
+
+        .at_pop {
+            display: none;
+            position: absolute;
+            background: #fff;
+            color: #333;
+            border: 1px solid #ccc;
+            border-radius: 2px;
+            box-shadow: 0px 2px 8px 1px rgba(0, 0, 0, 0.2);
+            font: 12px/1.3 "Arial", "Microsoft YaHei";
+            z-index: 100;
+            width: 154px;
+            box-sizing: border-box;
+            padding: 0;
+
+        }
+
+        .at_pop li {
+            height: 30px;
+            width: 100%;
+            padding: 10px;
+            box-sizing: border-box;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            cursor: pointer;
+
+        }
+
+        .at_pop li:hover {
+            background-color: #dcdcdc;
+        }
+
+
+        .pre_img_a {
+            z-index: 100;
+            display: none;
+            width: 120px;
+            height: 160px;
+            background-color: #fff;
+            position: fixed;
+            top: 30px;
+            left: 0;
+            box-shadow: 0 0 4px #3b5185;
+            padding: 10px;
+            box-sizing: border-box;
+            border-radius: 4px;
+
+        }
+
+        .pre_img_a .icon_img {
+            width: 100px;
+            height: 100px;
+            display: inline-block;
+        }
+
+        .pre_img_a .pre_name,
+        .iconfont {
+            color: #666666;
+        }
+
+        .pre_img_a .pre_name {
+            font-size: 12px;
+            line-height: 16px;
+            width: 100px;
+            display: block;
+            margin-top: -8px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .pre_img_a .iconfont {
+            font-size: 14px;
+            line-height: 14px;
+            margin-left: 10px;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="editor" spellcheck="false">0123456789helloworld新建任务</div>
+    <ul class="at_pop" id="atPop">
+        <li ids="001">Mark</li>
+        <li ids="002">Jerry</li>
+        <li ids="003">ABCDEFG</li>
+        <li ids="004">祝建云</li>
+        <li ids="005">赵珂</li>
+    </ul>
+
+    <button id="upload">上传文件</button>
+    <div class="pre_img_a" id="preview">
+        <img class="icon_img" src="http://server.apexgame.cn/upload/file/20180917035852/97bc6665-c457-4ec6-b2ea-233926cc4010/b97cde35-b015-40d2-abf9-9c32adcb2c07.png"
+            alt="">
+        <span class="pre_name">7.png</span>
+        <i fileid="4309" class="pre_del iconfont icon-delete fr">DEL</i>
+        <i fileid="4309" class="pre_edit iconfont icon-bi fr">EDIT</i>
+    </div>
+
+</body>
+<script src="https://cdn.quilljs.com/1.3.6/quill.js"></script>
+<script type="text/javascript" src="https://unpkg.com/jquery"></script>
+<script type="text/javascript" src="https://unpkg.com/jquery.caret"></script>
+
+<!-- Initialize Quill editor -->
+<script>
+    $('#atPop').hide();
+    var quill = new Quill('#editor', {
+        theme: 'snow',
+    });
+    var curP = 0, delFlag = true, addFileFlag = false, nowFileId = '';
+    var file = [{
+            ids: '001',
+            name: '1.png',
+            url: 'http://server.apexgame.cn/upload/file/20180918022149/ca47eaa3-5835-4f71-922f-0731f7f096bb/332c84fd-f34b-4808-8c99-9dc67a2933c6.png'
+        }]
+    curP = quill.getLength();
+    quill.setSelection(curP);
+
+    // 失去焦点时，保存光标的位置
+    $('#editor .ql-editor').blur(function () {
+        curP = quill.getSelection().index;
+    });
+
+
+    quill.on('text-change', function (delta, oldDelta, source) {
+        // console.log('log------text-change', delta);
+        let ops = delta.ops[delta.ops.length - 1];
+        var selection, node = null, length = 0, parentNode, innerHtml;
+
+        // 添加 @人员
+        if (ops.insert) {
+            if (!$("#atPop").is(":hidden")) $('#atPop').hide();
+
+            selection = window.getSelection();
+            parentNode = selection.extentNode.parentNode;
+            if (ops.insert == ' ' && parentNode.tagName !== 'STRONG' && parentNode.tagName !== 'U') {
+                return;
+            }
+
+            if (parentNode.tagName === 'STRONG' || parentNode.tagName === 'U' && !addFileFlag) { // 不允许插入 delFlag true
+                length = ops.insert.length;
+                curP = quill.getSelection().index;
+                delFlag = false;
+                quill.deleteText(curP - 1, length);
+                setTimeout(() => {
+                    quill.setSelection(curP - 1);
+
+                }, 0);
+
+            }
+            if (ops.insert === "@") {
+                curP = quill.getSelection().index;
+                showAtPop();
+            } else {
+                if (!$("#atPop").is(":hidden")) $('#atPop').hide();
+            }
+
+        }
+        // 删除 @人员/附件
+        else if (ops.delete && delFlag) {
+            if (!$("#atPop").is(":hidden")) $('#atPop').hide();
+            selection = window.getSelection();
+            parentNode = selection.extentNode.parentNode;
+
+            if (parentNode.tagName === 'STRONG' || parentNode.tagName === 'U') {
+                innerHtml = parentNode.innerHTML;
+                length = innerHtml.length;
+                curP = quill.getSelection().index;
+                // 循环看现在前面有几个字符要删除
+                let num = 0, cont;
+                for (let x = curP - 1; x > 0; x--) {
+                    cont = quill.getContents(x, 1);
+                    if (cont.ops[0].attributes && cont.ops[0].attributes.color === '#253ca6') {
+                        num++;
+                    } else {
+                        break;
+                    }
+                }
+                selection = window.getSelection();
+                parentNode = selection.extentNode.parentNode;
+                node = $(parentNode).empty();
+                setTimeout(() => {
+                    quill.setSelection(curP - num);
+                    curP = quill.getSelection().index;
+                    cont = quill.getContents(curP, 1);
+                    if (cont.ops[0].insert && cont.ops[0].insert == ' ') {
+                        quill.deleteText(curP, 1);
+                    }
+
+                    if (parentNode.tagName === 'U') { // 删除附件前面的图片
+                        curP = quill.getSelection().index;
+                        quill.deleteText(curP - 1, 1);
+                    }
+
+                }, 0);
+
+            }
+        } else {
+            if (!$("#atPop").is(":hidden")) $('#atPop').hide();
+        }
+
+        if (!delFlag) {
+            delFlag = true;
+        }
+
+
+
+    });
+    // 展示弹出层
+    function showAtPop() {
+        let pos = $('#editor .ql-editor').caret('position');
+        $('#atPop').css("top", pos.top + 8 - $('#editor').scrollTop());
+        $('#atPop').css("left", pos.left + 10);
+        if ($("#atPop").is(":hidden")) $('#atPop').show();
+    };
+
+    // @人员
+    $('#atPop').on('click', 'li', function () {
+        let name, lengths;
+        name = $(this).text();
+        quill.formatText(curP - 1, 1, {
+            'color': '#253ca6',
+            'bold': true
+        });
+        // quill.deleteText(curP - 1, 1);
+        quill.insertText(curP, name, {
+            'color': '#253ca6',
+            'bold': true
+        }, true);
+        lengths = name.length;
+        quill.insertText(curP + lengths, ' ', { 'color': '#000000', 'bold': false }, true);
+        quill.setSelection(curP + lengths + 1);
+        $('#atPop').hide();
+    });
+
+    // 上传文件
+    var flag = true;
+    $('#upload').click(function (e) {
+       
+        addFileFlag = true;
+        let imgUrl = '';
+        if (flag) {
+            imgUrl = 'http://server.apexgame.cn/upload/file/20180918022149/ca47eaa3-5835-4f71-922f-0731f7f096bb/332c84fd-f34b-4808-8c99-9dc67a2933c6.png';
+        } else {
+            imgUrl = 'http://server.apexgame.cn/upload/file/20180918063335/5f35b6a5-251d-41ab-a15c-a25f4984d4d8/4b19596a-82df-40e4-9f10-839bfdada00e.png';
+        }
+        flag = !flag;
+        let fileName = '1.png';
+        quill.insertEmbed(curP, 'image', imgUrl);
+        curP = quill.getSelection().index;
+        quill.setSelection(curP + 1);
+        quill.insertText(curP + 1, fileName, { 'color': '#253ca6', 'underline': true}, true);
+        quill.insertText(curP + fileName.length + 1, ' ', { 'color': '#000000', 'underline': false }, true);
+        quill.setSelection(curP + fileName.length + 2);
+        addFileFlag = false;
+
+    });
+
+    // $('#editor .ql-editor').on('mouseenter', 'img', function (e) {
+    //     var X = $(this).offset().top;
+    //     var Y = $(this).offset().left;
+    //     $('#preview').show().css({ top: X + 24, left: Y });
+    // });
+
+
+    $("#preview").mouseenter(function () {
+        $('#preview').show();
+    }).mouseleave(() => {
+        $('#preview').hide();
+    });
+    $('#editor .ql-editor').on('mouseover', function (e) {
+        let target = $(e.target);
+        if (target.prop("tagName") == 'IMG' || target.prop("tagName") == 'U') {
+            let text = '';
+            if(target.prop("tagName") == 'IMG') {
+                text = target.next().text();
+            }else {
+                text = target.text();
+            }
+            let files = file.find( el => {
+                return text == el.name;
+            });
+            if(files) {
+                nowFileId = files.ids;
+            }
+
+            var X = target.offset().top;
+            var Y = target.offset().left;
+            $('#preview').show().css({ top: X + 24, left: Y });
+        } else {
+            // $('#preview').hide();
+        }
+    });
+
+
+</script>
+
+</html>
